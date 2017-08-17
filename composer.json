@@ -1,0 +1,25 @@
+{
+    "name": "gulch/monot",
+    "description": "Monitoring Availability of Server or Service",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.1",
+        "ext-curl": "*",
+        "league/booboo": "^1.0",
+        "monolog/monolog": "^1.23",
+        "gulch/monolog-telegram": "dev-master"
+    },
+    "require-dev": {
+
+    },
+    "repositories":[
+        {
+            "type": "git",
+            "url": "https://github.com/gulch/monolog-telegram"
+        }
+    ],
+    "autoload": {
+        "psr-4": {"Monot\\": "src/"}
+    }
+}
