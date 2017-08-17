@@ -1,5 +1,6 @@
+/.idea/
+/vendor/
+/storage/
 composer.lock
-.idea
-vendor
-bootstrap.php
-storage
+app.php
+.env

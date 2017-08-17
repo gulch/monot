@@ -7,7 +7,6 @@ use League\BooBoo\Handler\HandlerInterface;
 
 class MonotLogHandler implements HandlerInterface
 {
-
     protected $logger;
 
     public function __construct(LoggerInterface $logger)
@@ -17,7 +16,6 @@ class MonotLogHandler implements HandlerInterface
 
     public function handle(\Exception $e): void
     {
-
         if ($e instanceof \ErrorException) {
             $this->handleErrorException($e);
             return;

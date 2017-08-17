@@ -8,7 +8,8 @@
         "ext-curl": "*",
         "league/booboo": "^1.0",
         "monolog/monolog": "^1.23",
-        "gulch/monolog-telegram": "dev-master"
+        "gulch/monolog-telegram": "dev-master",
+        "vlucas/phpdotenv": "^2.4"
     },
     "require-dev": {
 
