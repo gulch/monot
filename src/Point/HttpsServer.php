@@ -52,8 +52,6 @@ class HttpsServer implements Point
      */
     private function checkByCurl(): string
     {
-        $message = '';
-
         $ch = curl_init();
 
         curl_setopt_array($ch, [
@@ -65,24 +63,20 @@ class HttpsServer implements Point
             CURLOPT_SSL_VERIFYPEER => false,
         ]);
 
-        $response = curl_exec($ch);
-
-        if ($response === false) {
-            $message = 'Http server is not available: ' . curl_error($ch);
-        }
+        curl_exec($ch);
 
         if ($error = curl_error($ch)) {
-            $message = 'Error: ' . $error;
+            return 'Error: ' . $error;
         }
 
         $http_code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($http_code !== self::SUCCESS_CODE) {
-            $message = "Http server {$this->host} return code {$http_code} when expecting " . self::SUCCESS_CODE;
+            return "Http server {$this->host} return code {$http_code} when expecting " . self::SUCCESS_CODE;
         }
 
         curl_close($ch);
 
-        return $message;
+        return '';
     }
 }

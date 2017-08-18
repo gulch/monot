@@ -12,7 +12,7 @@ $logger = new \Monolog\Logger('MonotApp', [
 \Monolog\ErrorHandler::register($logger);
 
 /* Register Dotenv */
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = new \Dotenv\Dotenv(__DIR__);
 $dotenv->load();
 
 $token = getenv('TELEGRAM_BOT_TOKEN');

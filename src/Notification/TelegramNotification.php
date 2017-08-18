@@ -40,8 +40,8 @@ class TelegramNotification implements Notification
 
         $response = curl_exec($ch);
 
-        if ($response === false) {
-            throw new \ErrorException('Telegram API not available:' . curl_error($ch));
+        if ($error = curl_error($ch)) {
+            throw new \RuntimeException(curl_error($ch));
         }
 
         $data = json_decode($response, true);
