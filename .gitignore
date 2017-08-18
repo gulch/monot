@@ -2,5 +2,4 @@
 /vendor/
 /storage/
 composer.lock
-app.php
 .env
