@@ -3,6 +3,7 @@
 namespace Monot\Point;
 
 use Monot\Contract\Point;
+use Monot\Contract\Notification;
 
 class HttpsServer implements Point
 {
@@ -11,58 +12,77 @@ class HttpsServer implements Point
 
     private $host;
     private $timeout;
+    private $notifier;
 
     /**
      * HttpsServer constructor.
-     * @param string $host (domain or IP)
+     *
+     * @param Notification $notifier
+     * @param string $host (domain)
      * @param int $timeout (in seconds)
      */
-    public function __construct(string $host, int $timeout)
+    public function __construct(Notification $notifier, string $host, int $timeout = 5)
     {
         $this->host = $host;
         $this->timeout = $timeout;
+        $this->notifier = $notifier;
     }
 
     public function getTarget(): string
     {
-        return 'https://' . $this->host . ':' . self::DEFAULT_PORT;
+        return 'https://' . $this->host;
     }
 
-    public function check(): void
+    public function check(): bool
     {
-        if (!extension_loaded('curl')) {
-            throw new \RuntimeException('cURL extension not loaded. This library requires cURL.');
+        $message = $this->checkByCurl();
+
+        /* if message is empty, check is passed */
+        if ($message === '') {
+            return true;
         }
 
-        $curl = curl_init($this->getTarget());
+        $this->notifier->notify($message);
 
-        curl_setopt_array($curl, [
+        return false;
+    }
+
+    /**
+     * @return string (text of error message or '' string)
+     */
+    private function checkByCurl(): string
+    {
+        $message = '';
+
+        $ch = curl_init();
+
+        curl_setopt_array($ch, [
+            CURLOPT_URL => $this->getTarget(),
+            CURLOPT_PORT => self::DEFAULT_PORT,
             CURLOPT_CONNECTTIMEOUT => $this->timeout,
             CURLOPT_NOBODY => true,
             CURLOPT_RETURNTRANSFER => false,
             CURLOPT_SSL_VERIFYPEER => false,
         ]);
 
-        $response = curl_exec($curl);
+        $response = curl_exec($ch);
 
         if ($response === false) {
-            throw new \RuntimeException('Http server is not available: ' . curl_error($curl));
+            $message = 'Http server is not available: ' . curl_error($ch);
         }
 
-        if ($error = curl_error($curl)) {
-            throw new \ErrorException('Error: ' . $error, 0, E_USER_ERROR);
+        if ($error = curl_error($ch)) {
+            $message = 'Error: ' . $error;
         }
 
-        $http_code = (int)curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $http_code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($http_code !== self::SUCCESS_CODE) {
-            throw new \ErrorException(
-                "Http server {$this->host} return code {$http_code} when expecting " . self::SUCCESS_CODE,
-                $http_code,
-                E_USER_WARNING
-            );
+            $message = "Http server {$this->host} return code {$http_code} when expecting " . self::SUCCESS_CODE;
         }
 
-        curl_close($curl);
+        curl_close($ch);
+
+        return $message;
     }
 }
